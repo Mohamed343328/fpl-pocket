@@ -70,7 +70,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:12px}
 <footer>FPL Pocket • البيانات من واجهة Fantasy Premier League العامة</footer>
 </main>
 <script>
-const API='https://fantasy.premierleague.com/api/';
+const API='/api/fpl?path=';
 const $=id=>document.getElementById(id);
 let timer=null, lastEvents=new Set(), lastData=null;
 const saved=localStorage.getItem('fplTeamId'); if(saved) $('teamId').value=saved;
