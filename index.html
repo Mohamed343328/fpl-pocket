@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<meta name="description" content="FPL Pocket - تابع فريقك ونقاطك في فانتازي الدوري الإنجليزي">
+<link rel="manifest" href="/manifest.webmanifest">
+<title>FPL Pocket</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121d2e;--panel2:#1a2940;--line:#2a3b55;--txt:#edf3fb;--muted:#9fb0c7;--green:#39d98a;--gold:#f6c85f;--red:#ff7373}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#101c30,#090f1b 65%);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;min-height:100vh}
+header{padding:22px 16px 14px;max-width:900px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-weight:900;font-size:23px;letter-spacing:.2px}.brand span{color:var(--green)}.sub{color:var(--muted);font-size:12px;margin-top:4px}
+main{max-width:900px;margin:auto;padding:0 14px 36px}.panel{background:rgba(18,29,46,.96);border:1px solid var(--line);border-radius:18px;padding:16px;margin:10px 0;box-shadow:0 10px 28px #0002}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.grow{flex:1}
+input{background:#0b1423;color:var(--txt);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:16px;min-width:0;flex:1}
+button{border:0;border-radius:12px;padding:12px 16px;background:var(--green);color:#07150e;font-weight:800;font-size:14px;cursor:pointer}
+button.secondary{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}button:disabled{opacity:.5}
+.muted{color:var(--muted)}.small{font-size:12px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.stat{background:var(--panel2);padding:13px;border-radius:14px;text-align:center}.stat b{display:block;font-size:24px;color:var(--green)}.stat span{font-size:11px;color:var(--muted)}
+.pitch{background:linear-gradient(#174d43,#123b38);border-radius:16px;padding:14px 8px;border:1px solid #28665b}
+.lineup{display:flex;justify-content:space-around;gap:4px;margin:12px 0;flex-wrap:wrap}
+.player{width:72px;text-align:center;position:relative;font-size:11px;min-height:74px}
+.shirt{width:34px;height:34px;border-radius:10px;background:#d9f3e7;color:#0c3528;margin:0 auto 5px;display:grid;place-items:center;font-weight:900;font-size:12px}
+.player .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}.player .pts{color:#bdf8d9;font-weight:800}.capt{position:absolute;top:-5px;right:8px;background:var(--gold);color:#211700;border-radius:50%;width:18px;height:18px;display:grid;place-items:center;font-size:10px;font-weight:900}
+h2{font-size:16px;margin:0 0 12px}.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.notice{padding:11px 13px;background:#17283e;border-radius:12px;color:var(--muted);font-size:13px;line-height:1.6}
+.error{color:#ffaaaa}.success{color:var(--green)}.hidden{display:none}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:10px 6px;border-bottom:1px solid var(--line);text-align:right}th{color:var(--muted);font-weight:600}
+.event{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}.event:last-child{border:0}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:12px}
+@media(max-width:430px){.player{width:62px}.stats{gap:6px}.stat{padding:10px 5px}.stat b{font-size:21px}}
+</style>
+</head>
+<body>
+<header><div><div class="brand">FPL <span>POCKET</span></div><div class="sub">متابعة فريقك في فانتازي الدوري الإنجليزي</div></div><button class="secondary" id="refreshBtn">تحديث ↻</button></header>
+<main>
+<section class="panel">
+ <div class="section-title"><h2>ربط فريقك</h2><span class="small muted">مرة واحدة فقط</span></div>
+ <div class="row"><input id="teamId" inputmode="numeric" placeholder="اكتب Team ID" aria-label="Team ID"><button id="loadBtn">عرض فريقي</button></div>
+ <div id="status" class="small muted" style="margin-top:10px">أدخل رقم فريقك لعرض التشكيلة والنقاط.</div>
+</section>
+<div id="dashboard" class="hidden">
+ <section class="panel">
+  <div class="stats">
+   <div class="stat"><b id="gwPoints">—</b><span>نقاط الجولة</span></div>
+   <div class="stat"><b id="overallPoints">—</b><span>إجمالي النقاط</span></div>
+   <div class="stat"><b id="gwRank">—</b><span>ترتيب الجولة</span></div>
+  </div>
+  <div class="row" style="justify-content:space-between;margin-top:13px"><div><b id="teamName">فريقي</b><div class="small muted" id="managerName"></div></div><div class="small muted" id="gwLabel"></div></div>
+ </section>
+ <section class="panel">
+  <div class="section-title"><h2>التشكيلة الأساسية</h2><span class="small muted">الكابتن عليه C</span></div>
+  <div class="pitch" id="pitch"><div class="muted small">سيتم عرض التشكيلة هنا</div></div>
+ </section>
+ <section class="panel">
+  <div class="section-title"><h2>البدلاء</h2><span class="small muted">حسب ترتيب مقاعد البدلاء</span></div>
+  <div id="bench" class="lineup"></div>
+ </section>
+ <section class="panel">
+  <div class="section-title"><h2>أحداث الجولة للاعبيك</h2><span class="small muted">تحديث أثناء فتح التطبيق</span></div>
+  <div id="events"><div class="muted small">لا توجد أحداث جديدة بعد.</div></div>
+ </section>
+ <section class="panel">
+  <div class="row"><button id="notifyBtn" class="secondary grow">تفعيل تنبيهات الهاتف</button><button id="autoBtn" class="secondary grow">التحديث التلقائي: متوقف</button></div>
+  <p class="small muted" style="line-height:1.7;margin-bottom:0">التنبيهات تعمل أثناء فتح التطبيق فقط. التنبيه عند إغلاق التطبيق يحتاج خادم إشعارات منفصلًا.</p>
+ </section>
+</div>
+<footer>FPL Pocket • البيانات من واجهة Fantasy Premier League العامة</footer>
+</main>
+<script>
+const API='https://fantasy.premierleague.com/api/';
+const $=id=>document.getElementById(id);
+let timer=null, lastEvents=new Set(), lastData=null;
+const saved=localStorage.getItem('fplTeamId'); if(saved) $('teamId').value=saved;
+function msg(t,err=false){$('status').textContent=t;$('status').className='small '+(err?'error':'muted')}
+async function getJSON(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('تعذر جلب البيانات ('+r.status+')');return r.json()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function playerCard(p,pick,live){const cap=pick.is_captain?'<span class="capt">C</span>':'';const mult=pick.multiplier||1;const pts=(live?.stats?.total_points??p.event_points??0)*mult;return `<div class="player">${cap}<div class="shirt">${esc(p.web_name.slice(0,3))}</div><div class="name">${esc(p.web_name)}</div><div class="pts">${pts} pts</div></div>`}
+async function load(){
+ const id=$('teamId').value.trim(); if(!/^\d+$/.test(id)){msg('اكتب Team ID صحيحًا بالأرقام فقط.',true);return}
+ localStorage.setItem('fplTeamId',id);$('loadBtn').disabled=true;$('refreshBtn').disabled=true;msg('جاري تحميل بيانات فريقك...');
+ try{
+  const [boot,entry]=await Promise.all([getJSON(API+'bootstrap-static/'),getJSON(API+'entry/'+id+'/')]);
+  const events=boot.events||[];let gw=events.find(e=>e.is_current)||events.find(e=>e.is_next)||events[events.length-1];
+  if(!gw)throw new Error('لم يتم العثور على الجولة الحالية.');
+  const picksData=await getJSON(API+'entry/'+id+'/event/'+gw.id+'/picks/');
+  const liveData=await getJSON(API+'event/'+gw.id+'/live/');
+  const players=Object.fromEntries(boot.elements.map(p=>[p.id,p]));
+  const live=Object.fromEntries((liveData.elements||[]).map(x=>[x.id,x]));
+  const picks=picksData.picks||[];
+  $('dashboard').classList.remove('hidden');
+  $('teamName').textContent=entry.name||'فريقي';
+  $('managerName').textContent=(entry.player_first_name||'')+' '+(entry.player_last_name||'');
+  $('gwLabel').textContent='الجولة '+gw.id+(gw.name?' • '+gw.name:'');
+  const livePoints=picks.reduce((s,k)=>s+((live[k.element]?.stats?.total_points??0)*(k.multiplier||1)),0);
+  $('gwPoints').textContent=livePoints;
+  $('overallPoints').textContent=entry.summary_overall_points??'—';
+  $('gwRank').textContent=entry.summary_event_rank?Number(entry.summary_event_rank).toLocaleString('en-US'):'—';
+  const starters=picks.filter(x=>x.position<=11);
+  const bench=picks.filter(x=>x.position>11);
+  const groups={1:[],2:[],3:[],4:[]};
+  starters.forEach(k=>{const p=players[k.element];if(p)groups[p.element_type].push(playerCard(p,k,live[k.element]))});
+  $('pitch').innerHTML=[1,2,3,4].map(pos=>groups[pos].length?`<div class="lineup">${groups[pos].join('')}</div>`:'').join('');
+  $('bench').innerHTML=bench.map(k=>players[k.element]?playerCard(players[k.element],k,live[k.element]):'').join('')||'<span class="muted small">لا يوجد بدلاء</span>';
+  renderEvents(picks,players,live);
+  lastData={picks,players,live,gw};msg('تم تحديث الفريق بنجاح.','ok');
+ }catch(e){msg('حصلت مشكلة: '+e.message+' — تأكد من Team ID واتصال الإنترنت.',true)}
+ finally{$('loadBtn').disabled=false;$('refreshBtn').disabled=false}
+}
+function renderEvents(picks,players,live){
+ const rows=[];
+ for(const k of picks){const p=players[k.element],l=live[k.element];if(!p||!l)continue;const s=l.stats||{};
+  const parts=[];if(s.goals_scored)parts.push('⚽ '+s.goals_scored+' هدف');if(s.assists)parts.push('🅰️ '+s.assists+' أسيست');if(s.clean_sheets)parts.push('🧤 كلين شيت');if(s.bonus)parts.push('⭐ '+s.bonus+' بونص');if(s.yellow_cards)parts.push('🟨 إنذار');if(s.red_cards)parts.push('🟥 طرد');if(s.penalties_saved)parts.push('🧤 تصدي ركلة جزاء');if(s.penalties_missed)parts.push('❌ إهدار ركلة جزاء');
+  if(parts.length){const key=k.element+':'+JSON.stringify(parts);rows.push({key,name:p.web_name,parts:parts.join(' • ')});if(!lastEvents.has(key)&&lastEvents.size&&Notification.permission==='granted')new Notification('FPL Pocket • '+p.web_name,{body:parts.join(' • ')});lastEvents.add(key)}
+ }
+ $('events').innerHTML=rows.length?rows.map(x=>`<div class="event"><b>${esc(x.name)}</b><span>${esc(x.parts)}</span></div>`).join(''):'<div class="muted small">لا توجد أحداث مسجلة للاعبي فريقك حتى الآن.</div>';
+}
+$('loadBtn').addEventListener('click',load);$('refreshBtn').addEventListener('click',load);
+$('teamId').addEventListener('keydown',e=>{if(e.key==='Enter')load()});
+$('notifyBtn').addEventListener('click',async()=>{if(!('Notification'in window)){msg('المتصفح لا يدعم تنبيهات الهاتف.',true);return}const p=await Notification.requestPermission();msg(p==='granted'?'تم تفعيل التنبيهات أثناء فتح التطبيق.':'لم يتم السماح بالتنبيهات.',p!=='granted')});
+$('autoBtn').addEventListener('click',()=>{if(timer){clearInterval(timer);timer=null;$('autoBtn').textContent='التحديث التلقائي: متوقف'}else{timer=setInterval(()=>{if($('teamId').value.trim())load()},60000);$('autoBtn').textContent='التحديث التلقائي: كل دقيقة'}});
+if('serviceWorker'in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
+if(saved)load();
+</script>
+</body>
+</html>
