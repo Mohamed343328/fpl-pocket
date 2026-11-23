@@ -1,0 +1,7 @@
+{
+  "name": "fpl-pocket",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A lightweight Fantasy Premier League PWA",
+  "engines": { "node": ">=20" }
+}
