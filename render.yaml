@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: fpl-pocket
-    runtime: node
-    plan: free
-    buildCommand: ""
-    startCommand: "npm start"
