@@ -1,0 +1,11 @@
+{
+  "name": "FPL Pocket - Fantasy Premier League",
+  "short_name": "FPL Pocket",
+  "description": "Your fantasy team and live points",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b100d",
+  "theme_color": "#101713",
+  "orientation": "portrait",
+  "icons": [{"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
